@@ -52,7 +52,6 @@ let Campo = {
                 }
             }
         }
-        console.log("locaisBombas: ", locaisBombas);
         return locaisBombas;
     },
     renderizarMascaraBombas() {
@@ -76,17 +75,27 @@ let Campo = {
                 }
             }
         }
-        console.log("locaisBombas:", locaisBombas);
-        console.log("this.mascaraBombas: ", this.mascaraBombas);
     },
     mouseBotaoEsquerdo(l, c) {
         console.log("pressisonado o botão esquerdo");
+        this.verificarJogada(l, c);
     },
     mouseBotaoDireito(l, c) {
+        let celula = document.querySelector(`[id="l-${l}/c-${c}"]`);
         document.querySelector(`[id="tabela"]`).oncontextmenu = (e) => {
             e.preventDefault();
         };
         console.log("pressisonado o botão direito");
+        if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
+            celula.setAttribute("class", "P");
+            celula.innerHTML = "<img src='./certeza.jpg' height=110px>";
+        } else if (!this.jogoFinalizado && celula.getAttribute("class") == "P") {
+            celula.setAttribute("class", "D");
+            celula.innerHTML = "<img src='./duvida.jpg' height=110px>";
+        } else if (!this.jogoFinalizado && celula.getAttribute("class") == "D") {
+            celula.setAttribute("class", "I");
+            celula.textContent = "";
+        }
     },
     renderizarMascaraBombasAoRedor() {
         let contarBombasAoRedor;
@@ -146,12 +155,30 @@ let Campo = {
                         }
                     } catch (erro) {}
                 }
-				mascaraBombasAoRedorLinha.push(contarBombasAoRedor);
+				contarBombasAoRedor = contarBombasAoRedor == 0 ? "" : contarBombasAoRedor;
+                mascaraBombasAoRedorLinha.push(contarBombasAoRedor);
             }
-			this.mascaraBombasAoRedor.push(mascaraBombasAoRedorLinha);
-			mascaraBombasAoRedorLinha = [];
+            this.mascaraBombasAoRedor.push(mascaraBombasAoRedorLinha);
+            mascaraBombasAoRedorLinha = [];
         }
         console.log(this.mascaraBombasAoRedor);
+    },
+    verificarJogada(l, c) {
+        // recebe parâmetros que indica o óndice da renderização HTML
+        let celula = document.querySelector(`[id="l-${l}/c-${c}"]`);
+        if (
+            !this.jogoFinalizado &&
+            this.mascaraBombas[l - 1][c - 1] == "B" &&
+            celula.getAttribute("class") == "I"
+        ) {
+            console.log("Game Over");
+            celula.setAttribute("class", "B");
+            celula.innerHTML = "<img src='./bomba.png' height=110px>";
+            this.jogoFinalizado = true;
+        } else if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
+            celula.setAttribute("class", "V");
+            celula.textContent = this.mascaraBombasAoRedor[l - 1][c - 1];
+        }
     },
 };
 
