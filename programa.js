@@ -88,10 +88,10 @@ let Campo = {
         console.log("pressisonado o botão direito");
         if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
             celula.setAttribute("class", "P");
-            celula.innerHTML = "<img src='./certeza.jpg' height=110px>";
+            celula.innerHTML = "<img src='./certeza.jpg' height=65px>";
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "P") {
             celula.setAttribute("class", "D");
-            celula.innerHTML = "<img src='./duvida.jpg' height=110px>";
+            celula.innerHTML = "<img src='./duvida.jpg' height=65px>";
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "D") {
             celula.setAttribute("class", "I");
             celula.textContent = "";
@@ -155,7 +155,7 @@ let Campo = {
                         }
                     } catch (erro) {}
                 }
-				contarBombasAoRedor = contarBombasAoRedor == 0 ? "" : contarBombasAoRedor;
+                contarBombasAoRedor = contarBombasAoRedor == 0 ? "" : contarBombasAoRedor;
                 mascaraBombasAoRedorLinha.push(contarBombasAoRedor);
             }
             this.mascaraBombasAoRedor.push(mascaraBombasAoRedorLinha);
@@ -172,12 +172,28 @@ let Campo = {
             celula.getAttribute("class") == "I"
         ) {
             console.log("Game Over");
-            celula.setAttribute("class", "B");
-            celula.innerHTML = "<img src='./bomba.png' height=110px>";
             this.jogoFinalizado = true;
+            this.mostrarTodasAsBombas(l, c);
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
             celula.setAttribute("class", "V");
             celula.textContent = this.mascaraBombasAoRedor[l - 1][c - 1];
+        }
+    },
+    mostrarTodasAsBombas(l, c) {
+        //console.log(l, c)
+        let celula;
+        for (let lin = 1; lin <= this.linhas; lin++) {
+            for (let col = 1; col <= this.colunas; col++) {
+                if (this.mascaraBombas[lin - 1][col - 1] == "B") {
+                    celula = document.querySelector(`[id="l-${lin}/c-${col}"]`);
+                    if (lin == l && col == c) {
+						celula.innerHTML = "<img src='./bomba-explodindo.png' height=65px>";
+						celula.setAttribute("class", "B");
+                    } else {
+                        celula.innerHTML = "<img src='./bomba-desarmada.png' height=65px>";
+                    }
+                }
+            }
         }
     },
 };
