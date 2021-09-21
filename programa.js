@@ -4,6 +4,7 @@ let Campo = {
     bombas: 5,
     mascaraBombas: [],
     mascaraBombasAoRedor: [],
+    jogadas: 0,
     jogoFinalizado: false,
     renderizarHTML() {
         let corpo = document.querySelector("body");
@@ -62,7 +63,7 @@ let Campo = {
             }
             this.mascaraBombas.push(mascaraLinha);
         }
-        console.log("this.mascaraBombas: ", this.mascaraBombas);
+        //console.log("this.mascaraBombas: ", this.mascaraBombas);
     },
     colocarBombasNaMascaraBombas() {
         let locaisBombas = this.sortearLocaisBombas();
@@ -77,7 +78,7 @@ let Campo = {
         }
     },
     mouseBotaoEsquerdo(l, c) {
-        console.log("pressisonado o botão esquerdo");
+        //console.log("pressisonado o botão esquerdo");
         this.verificarJogada(l, c);
     },
     mouseBotaoDireito(l, c) {
@@ -85,7 +86,7 @@ let Campo = {
         document.querySelector(`[id="tabela"]`).oncontextmenu = (e) => {
             e.preventDefault();
         };
-        console.log("pressisonado o botão direito");
+        //console.log("pressisonado o botão direito");
         if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
             celula.setAttribute("class", "P");
             celula.innerHTML = "<img src='./certeza.jpg' height=65px>";
@@ -161,22 +162,34 @@ let Campo = {
             this.mascaraBombasAoRedor.push(mascaraBombasAoRedorLinha);
             mascaraBombasAoRedorLinha = [];
         }
-        console.log(this.mascaraBombasAoRedor);
+        //console.log(this.mascaraBombasAoRedor);
     },
     verificarJogada(l, c) {
         // recebe parâmetros que indica o óndice da renderização HTML
         let celula = document.querySelector(`[id="l-${l}/c-${c}"]`);
+        let resultado;
+        resultado = document.querySelector("#jogada");
         if (
             !this.jogoFinalizado &&
             this.mascaraBombas[l - 1][c - 1] == "B" &&
             celula.getAttribute("class") == "I"
         ) {
-            console.log("Game Over");
+			resultado.setAttribute("class", "perdedor");
+			resultado.innerText = "Game Over. Você PERDEU!!! ";
+            console.log("Game Over. Você PERDEU!!! ");
             this.jogoFinalizado = true;
             this.mostrarTodasAsBombas(l, c);
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
             celula.setAttribute("class", "V");
             celula.textContent = this.mascaraBombasAoRedor[l - 1][c - 1];
+            this.jogadas++;
+            if (this.jogadas == this.linhas * this.colunas - this.bombas) {
+                this.jogoFinalizado = true;
+				resultado.setAttribute("class", "ganhador");
+                resultado.innerText = `Você GANHOU!!! Desviou das ${this.bombas} bombas! `;
+                console.log("Você GANHOU!!! ");
+            }
+            //console.log(this.jogadas)
         }
     },
     mostrarTodasAsBombas(l, c) {
@@ -187,8 +200,8 @@ let Campo = {
                 if (this.mascaraBombas[lin - 1][col - 1] == "B") {
                     celula = document.querySelector(`[id="l-${lin}/c-${col}"]`);
                     if (lin == l && col == c) {
-						celula.innerHTML = "<img src='./bomba-explodindo.png' height=65px>";
-						celula.setAttribute("class", "B");
+                        celula.innerHTML = "<img src='./bomba-explodindo.png' height=65px>";
+                        celula.setAttribute("class", "B");
                     } else {
                         celula.innerHTML = "<img src='./bomba-desarmada.png' height=65px>";
                     }

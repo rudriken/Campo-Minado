@@ -58,3 +58,12 @@ tr {
 img {
 	vertical-align: bottom;
 }
+.perdedor {
+	color: red;
+	font-weight: bold;
+}
+
+.ganhador {
+	color: rgb(14, 116, 1);
+	font-weight: bold;
+}
