@@ -1,9 +1,10 @@
 let corpo = document.querySelector("body");
 let placar = document.querySelector("#jogada");
+let linhas, colunas;
 
 let Campo = {
     quantBombas() {
-        return Math.ceil(this.pegarLinhasColunas()[0] * this.pegarLinhasColunas()[1] * 0.2);
+        return Math.ceil(linhas * colunas * 0.2);
     },
     mascaraBombas: [],
     mascaraBombasAoRedor: [],
@@ -17,9 +18,9 @@ let Campo = {
         let tabela = document.createElement("table");
         tabela.setAttribute("id", "tabela");
         let html = "<tbody>";
-        for (let l = 1; l <= this.pegarLinhasColunas()[0]; l++) {
+        for (let l = 1; l <= linhas; l++) {
             html += "<tr>";
-            for (let c = 1; c <= this.pegarLinhasColunas()[1]; c++) {
+            for (let c = 1; c <= colunas; c++) {
                 html += `
 					<td id="l-${l}/c-${c}" class="I" onclick="Campo.mouseBotaoEsquerdo(${l}, ${c})" oncontextmenu="Campo.mouseBotaoDireito(${l}, ${c})">
 					</td>
@@ -37,8 +38,8 @@ let Campo = {
         let localBomba;
         while (bombas < this.quantBombas()) {
             localBomba = [
-                Math.ceil(Math.random() * this.pegarLinhasColunas()[0]),
-                Math.ceil(Math.random() * this.pegarLinhasColunas()[1]),
+                Math.ceil(Math.random() * linhas),
+                Math.ceil(Math.random() * colunas),
             ];
             if (bombas == 0) {
                 locaisBombas.push(localBomba);
@@ -62,9 +63,9 @@ let Campo = {
         return locaisBombas;
     },
     renderizarMascaraBombas() {
-        for (let l = 0; l < this.pegarLinhasColunas()[0]; l++) {
+        for (let l = 0; l < linhas; l++) {
             let mascaraLinha = [];
-            for (let c = 0; c < this.pegarLinhasColunas()[1]; c++) {
+            for (let c = 0; c < colunas; c++) {
                 mascaraLinha.push(" ");
             }
             this.mascaraBombas.push(mascaraLinha);
@@ -192,7 +193,7 @@ let Campo = {
             this.jogadas++;
             if (
                 this.jogadas ==
-                this.pegarLinhasColunas()[0] * this.pegarLinhasColunas()[1] -
+                linhas * colunas -
                     this.quantBombas()
             ) {
                 this.jogoFinalizado = true;
@@ -209,8 +210,8 @@ let Campo = {
     mostrarTodasAsBombas(l, c) {
         //console.log(l, c)
         let celula;
-        for (let lin = 1; lin <= this.pegarLinhasColunas()[0]; lin++) {
-            for (let col = 1; col <= this.pegarLinhasColunas()[1]; col++) {
+        for (let lin = 1; lin <= linhas; lin++) {
+            for (let col = 1; col <= colunas; col++) {
                 if (this.mascaraBombas[lin - 1][col - 1] == "B") {
                     celula = document.querySelector(`[id="l-${lin}/c-${col}"]`);
                     if (lin == l && col == c) {
@@ -244,6 +245,7 @@ let Campo = {
         botaoComecar.textContent = "Começar";
         botaoComecar.onclick = function () {
             let reiniciar = false;
+			Campo.pegarLinhasColunas();
             if (Campo.inicializado) {
                 reiniciar = window.confirm(
                     "Tem certeza? Você já começou. Esse jogo será reiniciado se clicar em 'OK'!"
@@ -272,9 +274,9 @@ let Campo = {
         corpo.appendChild(botaoComecar);
     },
     pegarLinhasColunas() {
-        let linhas = document.querySelector("#linhas").value || 5;
-        let colunas = document.querySelector("#colunas").value || 5;
-        return [linhas, colunas];
+        linhas = document.querySelector("#linhas").value || 5;
+        colunas = document.querySelector("#colunas").value || 5;
+        //return [linhas, colunas];
     },
     apagarTabela() {
         try {
