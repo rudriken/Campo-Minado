@@ -276,7 +276,6 @@ let Campo = {
     pegarLinhasColunas() {
         linhas = document.querySelector("#linhas").value || 5;
         colunas = document.querySelector("#colunas").value || 5;
-        //return [linhas, colunas];
     },
     apagarTabela() {
         try {
