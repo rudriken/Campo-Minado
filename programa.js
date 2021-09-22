@@ -1,19 +1,24 @@
 let Campo = {
-    linhas: 5,
-    colunas: 8,
-    bombas: 5,
+    quantBombas() {
+        return Math.trunc(this.pegarLinhasColunas()[0] * this.pegarLinhasColunas()[1] * 0.2);
+    },
     mascaraBombas: [],
     mascaraBombasAoRedor: [],
     jogadas: 0,
+    inicializado: false,
     jogoFinalizado: false,
+    iniciar() {
+        this.criarElementosEntrada();
+        this.pegarLinhasColunas();
+    },
     renderizarHTML() {
         let corpo = document.querySelector("body");
         let tabela = document.createElement("table");
         tabela.setAttribute("id", "tabela");
         let html = "<tbody>";
-        for (let l = 1; l <= this.linhas; l++) {
+        for (let l = 1; l <= this.pegarLinhasColunas()[0]; l++) {
             html += "<tr>";
-            for (let c = 1; c <= this.colunas; c++) {
+            for (let c = 1; c <= this.pegarLinhasColunas()[1]; c++) {
                 html += `
 					<td id="l-${l}/c-${c}" class="I" onclick="Campo.mouseBotaoEsquerdo(${l}, ${c})" oncontextmenu="Campo.mouseBotaoDireito(${l}, ${c})">
 					</td>
@@ -29,10 +34,10 @@ let Campo = {
         let bombas = 0;
         let locaisBombas = [];
         let localBomba;
-        while (bombas < this.bombas) {
+        while (bombas < this.quantBombas()) {
             localBomba = [
-                Math.trunc(Math.random() * this.linhas) + 1,
-                Math.trunc(Math.random() * this.colunas) + 1,
+                Math.trunc(Math.random() * this.pegarLinhasColunas()[0]) + 1,
+                Math.trunc(Math.random() * this.pegarLinhasColunas()[1]) + 1,
             ];
             if (bombas == 0) {
                 locaisBombas.push(localBomba);
@@ -56,9 +61,9 @@ let Campo = {
         return locaisBombas;
     },
     renderizarMascaraBombas() {
-        for (let l = 0; l < this.linhas; l++) {
+        for (let l = 0; l < this.pegarLinhasColunas()[0]; l++) {
             let mascaraLinha = [];
-            for (let c = 0; c < this.colunas; c++) {
+            for (let c = 0; c < this.pegarLinhasColunas()[1]; c++) {
                 mascaraLinha.push(" ");
             }
             this.mascaraBombas.push(mascaraLinha);
@@ -174,19 +179,27 @@ let Campo = {
             this.mascaraBombas[l - 1][c - 1] == "B" &&
             celula.getAttribute("class") == "I"
         ) {
-			resultado.setAttribute("class", "perdedor");
-			resultado.innerText = "Game Over. Você PERDEU!!! ";
+            resultado.setAttribute("class", "perdedor");
+            resultado.innerText = "Game Over. Você PERDEU!!! ";
             console.log("Game Over. Você PERDEU!!! ");
             this.jogoFinalizado = true;
+            this.inicializado = false;
             this.mostrarTodasAsBombas(l, c);
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
             celula.setAttribute("class", "V");
             celula.textContent = this.mascaraBombasAoRedor[l - 1][c - 1];
             this.jogadas++;
-            if (this.jogadas == this.linhas * this.colunas - this.bombas) {
+            if (
+                this.jogadas ==
+                this.pegarLinhasColunas()[0] * this.pegarLinhasColunas()[1] -
+                    this.quantBombas()
+            ) {
                 this.jogoFinalizado = true;
-				resultado.setAttribute("class", "ganhador");
-                resultado.innerText = `Você GANHOU!!! Desviou das ${this.bombas} bombas! `;
+                this.inicializado = false;
+                resultado.setAttribute("class", "ganhador");
+                resultado.innerText = `Você GANHOU!!! Desviou de ${this.quantBombas()} ${
+                    this.quantBombas() == 1 ? " bomba" : " bombas"
+                }!`;
                 console.log("Você GANHOU!!! ");
             }
             //console.log(this.jogadas)
@@ -195,8 +208,8 @@ let Campo = {
     mostrarTodasAsBombas(l, c) {
         //console.log(l, c)
         let celula;
-        for (let lin = 1; lin <= this.linhas; lin++) {
-            for (let col = 1; col <= this.colunas; col++) {
+        for (let lin = 1; lin <= this.pegarLinhasColunas()[0]; lin++) {
+            for (let col = 1; col <= this.pegarLinhasColunas()[1]; col++) {
                 if (this.mascaraBombas[lin - 1][col - 1] == "B") {
                     celula = document.querySelector(`[id="l-${lin}/c-${col}"]`);
                     if (lin == l && col == c) {
@@ -209,10 +222,72 @@ let Campo = {
             }
         }
     },
+    criarElementosEntrada() {
+        let corpo = document.querySelector("body");
+
+        let rotuloLinha = document.createElement("label");
+        rotuloLinha.setAttribute("for", "linhas");
+        rotuloLinha.innerText = "Linhas: ";
+        let linhas = document.createElement("input");
+        linhas.setAttribute("type", "number");
+        linhas.setAttribute("id", "linhas");
+
+        let rotuloColuna = document.createElement("label");
+        rotuloColuna.setAttribute("for", "colunas");
+        rotuloColuna.innerText = " Colunas: ";
+        let colunas = document.createElement("input");
+        colunas.setAttribute("type", "number");
+        colunas.setAttribute("id", "colunas");
+
+        let botaoComecar = document.createElement("button");
+        botaoComecar.textContent = "Começar";
+        botaoComecar.onclick = function () {
+            let reiniciar = false;
+            if (Campo.inicializado) {
+                reiniciar = window.confirm(
+                    "Tem certeza? Você já começou. Esse jogo será reiniciado se clicar em 'OK'!"
+                );
+            }
+            if (!Campo.inicializado || reiniciar) {
+                let placar = document.querySelector("#jogada");
+                placar.innerText = "";
+                Campo.mascaraBombas = [];
+                Campo.mascaraBombasAoRedor = [];
+                Campo.jogadas = 0;
+                Campo.jogoFinalizado = false;
+                Campo.apagarTabela();
+                Campo.renderizarHTML();
+                Campo.renderizarMascaraBombas();
+                Campo.colocarBombasNaMascaraBombas();
+                Campo.renderizarMascaraBombasAoRedor();
+                Campo.inicializado = true;
+            }
+        };
+
+        rotuloLinha.appendChild(linhas);
+        rotuloColuna.appendChild(colunas);
+
+        corpo.appendChild(rotuloLinha);
+        corpo.appendChild(rotuloColuna);
+        corpo.appendChild(botaoComecar);
+    },
+    pegarLinhasColunas() {
+        let linhas = document.querySelector("#linhas").value || 5;
+        let colunas = document.querySelector("#colunas").value || 5;
+        return [linhas, colunas];
+    },
+    apagarTabela() {
+        try {
+            let corpo = document.querySelector("body");
+            let tabela = document.querySelector("#tabela");
+            let pai = document.createElement("div");
+            pai.setAttribute("id", "paiTabela");
+            pai.appendChild(tabela);
+            corpo.appendChild(pai);
+            pai.innerText = "";
+            pai.remove();
+        } catch (erro) {}
+    },
 };
 
-Campo.renderizarHTML();
-
-Campo.renderizarMascaraBombas();
-Campo.colocarBombasNaMascaraBombas();
-Campo.renderizarMascaraBombasAoRedor();
+Campo.iniciar();
