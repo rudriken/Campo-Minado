@@ -1,6 +1,9 @@
+let corpo = document.querySelector("body");
+let placar = document.querySelector("#jogada");
+
 let Campo = {
     quantBombas() {
-        return Math.trunc(this.pegarLinhasColunas()[0] * this.pegarLinhasColunas()[1] * 0.2);
+        return Math.ceil(this.pegarLinhasColunas()[0] * this.pegarLinhasColunas()[1] * 0.2);
     },
     mascaraBombas: [],
     mascaraBombasAoRedor: [],
@@ -9,10 +12,8 @@ let Campo = {
     jogoFinalizado: false,
     iniciar() {
         this.criarElementosEntrada();
-        this.pegarLinhasColunas();
     },
     renderizarHTML() {
-        let corpo = document.querySelector("body");
         let tabela = document.createElement("table");
         tabela.setAttribute("id", "tabela");
         let html = "<tbody>";
@@ -36,8 +37,8 @@ let Campo = {
         let localBomba;
         while (bombas < this.quantBombas()) {
             localBomba = [
-                Math.trunc(Math.random() * this.pegarLinhasColunas()[0]) + 1,
-                Math.trunc(Math.random() * this.pegarLinhasColunas()[1]) + 1,
+                Math.ceil(Math.random() * this.pegarLinhasColunas()[0]),
+                Math.ceil(Math.random() * this.pegarLinhasColunas()[1]),
             ];
             if (bombas == 0) {
                 locaisBombas.push(localBomba);
@@ -94,10 +95,10 @@ let Campo = {
         //console.log("pressisonado o botão direito");
         if (!this.jogoFinalizado && celula.getAttribute("class") == "I") {
             celula.setAttribute("class", "P");
-            celula.innerHTML = "<img src='./certeza.jpg' height=65px>";
+            celula.innerHTML = "<img src='./imagens/certeza.jpg' height=65px>";
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "P") {
             celula.setAttribute("class", "D");
-            celula.innerHTML = "<img src='./duvida.jpg' height=65px>";
+            celula.innerHTML = "<img src='./imagens/duvida.jpg' height=65px>";
         } else if (!this.jogoFinalizado && celula.getAttribute("class") == "D") {
             celula.setAttribute("class", "I");
             celula.textContent = "";
@@ -213,18 +214,18 @@ let Campo = {
                 if (this.mascaraBombas[lin - 1][col - 1] == "B") {
                     celula = document.querySelector(`[id="l-${lin}/c-${col}"]`);
                     if (lin == l && col == c) {
-                        celula.innerHTML = "<img src='./bomba-explodindo.png' height=65px>";
+                        celula.innerHTML =
+                            "<img src='./imagens/bomba-explodindo.png' height=65px>";
                         celula.setAttribute("class", "B");
                     } else {
-                        celula.innerHTML = "<img src='./bomba-desarmada.png' height=65px>";
+                        celula.innerHTML =
+                            "<img src='./imagens/bomba-desarmada.png' height=65px>";
                     }
                 }
             }
         }
     },
     criarElementosEntrada() {
-        let corpo = document.querySelector("body");
-
         let rotuloLinha = document.createElement("label");
         rotuloLinha.setAttribute("for", "linhas");
         rotuloLinha.innerText = "Linhas: ";
@@ -249,7 +250,6 @@ let Campo = {
                 );
             }
             if (!Campo.inicializado || reiniciar) {
-                let placar = document.querySelector("#jogada");
                 placar.innerText = "";
                 Campo.mascaraBombas = [];
                 Campo.mascaraBombasAoRedor = [];
@@ -278,10 +278,8 @@ let Campo = {
     },
     apagarTabela() {
         try {
-            let corpo = document.querySelector("body");
             let tabela = document.querySelector("#tabela");
             let pai = document.createElement("div");
-            pai.setAttribute("id", "paiTabela");
             pai.appendChild(tabela);
             corpo.appendChild(pai);
             pai.innerText = "";
