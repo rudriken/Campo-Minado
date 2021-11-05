@@ -4,7 +4,7 @@ let linhas, colunas;
 
 let Campo = {
     quantBombas() {
-        return Math.ceil(linhas * colunas * 0.2);
+        return Math.ceil(linhas * colunas * 0.15);
     },
     mascaraBombas: [],
     mascaraBombasAoRedor: [],
@@ -191,11 +191,7 @@ let Campo = {
             celula.setAttribute("class", "V");
             celula.textContent = this.mascaraBombasAoRedor[l - 1][c - 1];
             this.jogadas++;
-            if (
-                this.jogadas ==
-                linhas * colunas -
-                    this.quantBombas()
-            ) {
+            if (this.jogadas == linhas * colunas - this.quantBombas()) {
                 this.jogoFinalizado = true;
                 this.inicializado = false;
                 resultado.setAttribute("class", "ganhador");
@@ -245,7 +241,7 @@ let Campo = {
         botaoComecar.textContent = "Começar";
         botaoComecar.onclick = function () {
             let reiniciar = false;
-			Campo.pegarLinhasColunas();
+            Campo.pegarLinhasColunas();
             if (Campo.inicializado) {
                 reiniciar = window.confirm(
                     "Tem certeza? Você já começou. Esse jogo será reiniciado se clicar em 'OK'!"
